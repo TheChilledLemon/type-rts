@@ -16,6 +16,9 @@ async fn main() {
         if let Some(command) = get_input(&mut game_state) {
             println!("{:?}", command);
         }
+
+        
+        game_state.update_nodes();
         
         game_state.draw_gamestate();
 

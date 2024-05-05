@@ -1,11 +1,19 @@
+use core::time;
+
 use macroquad::{math, prelude::*};
-use crate::node::{Node};
+use crate::node::{Node, Player};
 
 #[derive(Debug)]
 pub struct Command {
     pub source: String,
     pub destination: String,
     pub quantity: usize
+}
+
+impl Command {
+    pub fn source_to_index(&self) {
+
+    }
 }
 
 pub struct GameState {
@@ -32,6 +40,9 @@ impl GameState {
             board.push(row);
         }
 
+        board[0][0].owner = Player::Player;
+        board[rows - 1][cols - 1].owner = Player::AI;
+
         GameState {
             player_buffer: String::new(),
             board,
@@ -57,7 +68,10 @@ impl GameState {
         for row in self.board.iter_mut() {
             for node in row {
                 let rate = node.owner.value().respawn_rate.clone();
-                // TODO: finish later
+                if time_now - node.last_spawn >= rate {
+                    node.num_units += 1;
+                    node.last_spawn = time_now;
+                }
             }
         }
     }
@@ -74,7 +88,7 @@ impl GameState {
     }
 
     fn draw_nodes(&mut self, radius: f32) {
-        let font_size = (radius / 2.5) as u16;
+        let font_size = (radius / 2.0) as u16;
         for row in self.board.iter() {
             for node in row {
                 draw_circle(node.position.x, node.position.y, radius, node.owner.value().color);
@@ -101,8 +115,8 @@ impl GameState {
 
     fn update_node_positions(&mut self) {
         let offset = 100.0;
-        let x_increment = get_increment(offset, screen_width() - offset, self.cols as f32);
-        let y_increment = get_increment(offset, screen_height() - offset, self.rows as f32);
+        let x_increment = get_increment(offset, screen_width() - offset, self.cols);
+        let y_increment = get_increment(offset, screen_height() - offset, self.rows);
         
         for y_num in 0..self.rows {
             let y = offset + (y_increment * y_num as f32);
@@ -131,6 +145,6 @@ impl GameState {
     }
 }
 
-fn get_increment(edge_a: f32, edge_b: f32, num_items: f32) -> f32 {
-    (edge_b - edge_a).abs() / (num_items - 1 as f32)
+fn get_increment(edge_a: f32, edge_b: f32, num_items: usize) -> f32 {
+    (edge_b - edge_a).abs() / (num_items - 1) as f32
 }
