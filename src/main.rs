@@ -17,7 +17,7 @@ async fn main() {
             println!("{:?}", command);
         }
         
-        game_state.draw_board();
+        game_state.draw_gamestate();
 
         next_frame().await
     }
