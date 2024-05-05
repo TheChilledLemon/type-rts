@@ -1,4 +1,4 @@
-use crate::{gamestate::GameState, node::{Node, Player}};
+use crate::node::{Node, Player};
 use macroquad::prelude::*;
 
 #[derive(Clone, Copy, PartialEq, Debug)]

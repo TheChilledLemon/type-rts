@@ -15,7 +15,7 @@ impl Command {
             Some(src_tup) => {
                 match Command::to_index(&destination) {
                     Some(dest_tup) => {
-                        if (gamestate.valid_move(src_tup, dest_tup, quantity)) {
+                        if gamestate.valid_move(src_tup, dest_tup, quantity) {
                             Some(Command {
                                 source,
                                 destination,
@@ -190,7 +190,7 @@ impl GameState {
         }
     }
 
-    fn get_nearest_neighbors(&self, node: &Node) -> Vec<&Node> {
+    pub fn get_nearest_neighbors(&self, node: &Node) -> Vec<&Node> {
         let mut res: Vec<&Node> = Vec::new();
         if node.row_index > 0 {
             res.push(&self.board[node.row_index - 1][node.col_index])

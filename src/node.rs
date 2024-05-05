@@ -12,7 +12,7 @@ impl Player {
         match *self {
             Player::None => PlayerStruct {color: WHITE, respawn_rate: 3.0},
             Player::Player => PlayerStruct {color: BLUE, respawn_rate: 1.0},
-            Player::AI => PlayerStruct {color: RED, respawn_rate: 1.5},
+            Player::AI => PlayerStruct {color: RED, respawn_rate: 2.5},
         }
     }
 }
@@ -22,7 +22,7 @@ pub struct PlayerStruct {
     pub respawn_rate: f64,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub struct Node {
     pub position: Vec2,
     pub name: String,
