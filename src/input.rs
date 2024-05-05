@@ -17,8 +17,8 @@ pub fn get_input(game_state: &mut GameState) -> Option<Command> {
         if key.eq(&KeyCode::Enter) {
             let mut iter = player_buf.splitn(3, ' ');
             let source = String::from(iter.next().unwrap_or(""));
-            let dest = String::from(iter.next().unwrap_or(""));
-            let quant = String::from(iter.next().unwrap_or(""));
+            let destination = String::from(iter.next().unwrap_or(""));
+            let quantity_str = String::from(iter.next().unwrap_or(""));
 
             // Check if there's anything left in the buffer.
             if iter.next().is_some() {
@@ -27,16 +27,16 @@ pub fn get_input(game_state: &mut GameState) -> Option<Command> {
             player_buf.clear();
 
             // If we have an invalid set of arguments.
-            if source.is_empty() || dest.is_empty() || quant.is_empty() {
+            if source.is_empty() || destination.is_empty() || quantity_str.is_empty() {
                 return None
             }
             
             // Parse quantity as usize then return Command if successful.
-            if let Some(quant_int) = quant.parse::<usize>().ok() {
+            if let Some(quantity) = quantity_str.parse::<usize>().ok() {
                 return Some(Command{
-                    source: source,
-                    destination: dest,
-                    quantity: quant_int
+                    source,
+                    destination,
+                    quantity,
                 })
             }            
         }

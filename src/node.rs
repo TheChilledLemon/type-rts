@@ -1,4 +1,4 @@
-use macroquad::prelude::*;
+use macroquad::{miniquad::start, prelude::*};
 
 pub enum Player {
     None,
@@ -27,11 +27,12 @@ pub struct Node {
     pub row_index: usize,
     pub col_index: usize,
     pub owner: Player,
-    pub num_units: usize
+    pub num_units: usize,
+    pub last_spawn: f64
 }
 
 impl Node {
-    pub fn new(x: f32, y:f32, row_index: usize, col_index: usize) -> Self {
+    pub fn new(x: f32, y:f32, row_index: usize, col_index: usize, start_time: f64) -> Self {
         let letter = char::from_u32(row_index as u32 + 65).unwrap();
         let num = char::from_digit(col_index as u32, 10).unwrap();
         let mut name = String::new();
@@ -43,7 +44,8 @@ impl Node {
             col_index,
             name,
             owner: Player::None,
-            num_units: 0
+            num_units: 0,
+            last_spawn: start_time
         }
     }
 }

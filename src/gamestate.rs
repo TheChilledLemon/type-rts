@@ -21,12 +21,13 @@ impl GameState {
             panic!("Invalid board dimensions");
         }
 
+        let start_time = get_time();
         let mut board: Vec<Vec<Node>> = Vec::new(); 
 
         for y_num in 0..rows {
             let mut row: Vec<Node> = Vec::new();
             for x_num in 0..cols {
-                row.push(Node::new(0.0, 0.0, y_num, x_num))
+                row.push(Node::new(0.0, 0.0, y_num, x_num, start_time))
             }
             board.push(row);
         }
@@ -45,6 +46,20 @@ impl GameState {
         let thickness = radius / 5.0;
         self.draw_lines(thickness);
         self.draw_nodes(radius);
+    }
+
+    pub fn update_units(&mut self) {
+
+    }
+
+    pub fn update_nodes(&mut self) {
+        let time_now = get_time();
+        for row in self.board.iter_mut() {
+            for node in row {
+                let rate = node.owner.value().respawn_rate.clone();
+                // TODO: finish later
+            }
+        }
     }
 
     fn draw_lines(&mut self, thickness: f32) {
