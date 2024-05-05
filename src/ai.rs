@@ -26,10 +26,10 @@ impl AI {
     if time_now - self.last_command > 3.0 {
         self.last_command = time_now;
         let reachable_nodes: Vec<&Node> = get_reachable(gamestate);
-        let dest_node = reachable_nodes.iter().max_by_key(|node| scoring_func(gamestate, node)).unwrap();
+        let dest_node = reachable_nodes.iter().max_by_key(|node| scoring_func(gamestate, node))?;
 
         let neighbors = gamestate.get_nearest_neighbors(&dest_node);
-        let max_neigh = neighbors.iter().filter(|neigh| neigh.owner == Player::AI).max_by_key(|neigh| neigh.num_units).unwrap();
+        let max_neigh = neighbors.iter().filter(|neigh| neigh.owner == Player::AI).max_by_key(|neigh| neigh.num_units)?;
         if max_neigh.num_units as i32 - dest_node.num_units as i32 > 5 {
             return Some(Move {
                 source: (max_neigh.row_index, max_neigh.col_index),

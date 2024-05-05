@@ -26,7 +26,13 @@ impl Unit {
     pub fn update(&mut self, board: &mut Vec<Vec<Node>>) -> bool {
         // Update position
         let dest_node = &mut board[self.destination.0][self.destination.1];
-        self.position += (dest_node.position - self.position).normalize() * (screen_width().min(screen_width()) / 175.0) / self.quantity as f32;
+        let speed: f32;
+        if self.quantity < 100 {
+            speed = 10.0;
+        } else {
+            speed = 20.0;
+        }
+        self.position += (dest_node.position - self.position).normalize() * (screen_width().min(screen_width()) / 175.0) / speed;
 
         // Check if we reach destination
         if self.position.distance(dest_node.position) < 5.0 {

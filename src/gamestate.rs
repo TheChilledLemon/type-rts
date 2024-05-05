@@ -37,7 +37,7 @@ impl Command {
         let chars: Vec<char> = coord.chars().collect();
         if chars.len() == 2 {
             let row: usize = chars[0] as usize - 65;
-            let col: usize = chars[1].to_digit(10).unwrap() as usize;
+            let col: usize = chars[1].to_digit(10)? as usize;
             Some((row, col))
         } else {
             None
