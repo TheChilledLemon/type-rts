@@ -1,24 +1,54 @@
-use core::time;
-
-use macroquad::{math, prelude::*};
+use macroquad::prelude::*;
 use crate::node::{Node, Player};
+use crate::unit::Unit;
 
-#[derive(Debug)]
 pub struct Command {
     pub source: String,
     pub destination: String,
-    pub quantity: usize
+    pub quantity: u32,
+    pub owner: Player
 }
 
 impl Command {
-    pub fn source_to_index(&self) {
+    pub fn new(source: String, destination: String, quantity: u32, owner: Player, gamestate: &GameState) -> Option<Self> {
+        match Command::to_index(&source) {
+            Some(src_tup) => {
+                match Command::to_index(&destination) {
+                    Some(dest_tup) => {
+                        if (gamestate.valid_move(src_tup, dest_tup, quantity)) {
+                            Some(Command {
+                                source,
+                                destination,
+                                quantity,
+                                owner
+                            })
+                        } else {
+                            None
+                        }
+                    }
+                    _ => None
+                }
+            }
+            _ => None
+        }
+    }
 
+    pub fn to_index(coord: &String) -> Option<(usize, usize)> {
+        let chars: Vec<char> = coord.chars().collect();
+        if chars.len() == 2 {
+            let row: usize = chars[0] as usize - 65;
+            let col: usize = chars[1].to_digit(10).unwrap() as usize;
+            Some((row, col))
+        } else {
+            None
+        }
     }
 }
 
 pub struct GameState {
     pub player_buffer: String,
     pub board: Vec<Vec<Node>>,
+    pub units: Vec<Unit>,
     rows: usize,
     cols: usize
 }
@@ -46,9 +76,35 @@ impl GameState {
         GameState {
             player_buffer: String::new(),
             board,
+            units: Vec::new(),
             rows,
             cols
         }
+    }
+
+    pub fn add_unit(&mut self, source: (usize, usize), dest: (usize, usize), quantity: u32) {
+        let src_node = &mut self.board[source.0][source.1];
+        src_node.num_units -= quantity;
+        self.units.push(Unit::new(src_node.position.x, src_node.position.y,
+            src_node.owner.clone(), quantity, source, dest))
+    }
+
+    pub fn valid_move(& self, source: (usize, usize), dest: (usize, usize), quantity: u32) -> bool {
+        if !self.inbounds(source) || !self.inbounds(dest) {
+            return false;
+        }
+        let src_node = &self.board[source.0][source.1];
+        let dest_node = &self.board[dest.0][dest.1];
+        if !matches!(src_node.owner, Player::Player) {
+            return false;
+        }
+        if src_node.num_units < quantity {
+            return false;
+        }
+        if !self.get_nearest_neighbors(src_node).contains(&dest_node) {
+            return false;
+        }
+        true
     }
 
     pub fn draw_gamestate(&mut self) {
@@ -56,18 +112,19 @@ impl GameState {
         let radius = screen_width().min(screen_height()) / 20.0;
         let thickness = radius / 5.0;
         self.draw_lines(thickness);
+        self.draw_units(radius / 3.0);
         self.draw_nodes(radius);
     }
 
     pub fn update_units(&mut self) {
-
+        self.units.retain_mut(|unit: &mut Unit| unit.update(&mut self.board));
     }
 
     pub fn update_nodes(&mut self) {
         let time_now = get_time();
         for row in self.board.iter_mut() {
             for node in row {
-                let rate = node.owner.value().respawn_rate.clone();
+                let rate = node.owner.value().respawn_rate;
                 if time_now - node.last_spawn >= rate {
                     node.num_units += 1;
                     node.last_spawn = time_now;
@@ -84,6 +141,12 @@ impl GameState {
                         i.position.x, i.position.y, thickness, LIGHTGRAY)
                 }
             }
+        }
+    }
+
+    fn draw_units(&mut self, radius: f32) {
+        for unit in self.units.iter_mut() {
+            unit.draw(radius);
         }
     }
 
@@ -142,6 +205,14 @@ impl GameState {
             res.push(&self.board[node.row_index][node.col_index + 1])
         }
         res
+    }
+
+    fn inbounds(&self, coord: (usize, usize)) -> bool {
+        if coord.0 >= self.rows || coord.1 >= self.cols {
+            false
+        } else {
+            true
+        }
     }
 }
 

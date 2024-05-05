@@ -1,5 +1,6 @@
-use macroquad::{miniquad::start, prelude::*};
+use macroquad::prelude::*;
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Player {
     None,
     Player,
@@ -21,13 +22,14 @@ pub struct PlayerStruct {
     pub respawn_rate: f64,
 }
 
+#[derive(PartialEq)]
 pub struct Node {
     pub position: Vec2,
     pub name: String,
     pub row_index: usize,
     pub col_index: usize,
     pub owner: Player,
-    pub num_units: usize,
+    pub num_units: u32,
     pub last_spawn: f64
 }
 

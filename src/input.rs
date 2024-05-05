@@ -1,4 +1,5 @@
 use crate::gamestate::{Command, GameState};
+use crate::node::Player;
 use macroquad::{prelude::*, ui::{root_ui, widgets}};
 
 pub fn get_input(game_state: &mut GameState) -> Option<Command> {
@@ -27,12 +28,8 @@ pub fn get_input(game_state: &mut GameState) -> Option<Command> {
                         Ok(array_input) => {
                             let [source, destination, quantity_str] = array_input;
 
-                            match quantity_str.parse::<usize>() {
-                                Ok(quantity) => Some(Command{
-                                    source,
-                                    destination,
-                                    quantity,
-                                }),
+                            match quantity_str.parse::<u32>() {
+                                Ok(quantity) => Command::new(source, destination, quantity, Player::Player, &game_state),
                                 _ => None
                             }
                         }
